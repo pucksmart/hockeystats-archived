@@ -2,8 +2,10 @@ package com.briandevinssures.hockeystats.scraper.player;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.UUID;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.time.LocalDate;
 
 @Data
 @Builder(builderClassName = "Builder")
@@ -12,14 +14,18 @@ import java.util.UUID;
 @Entity
 @Table(
         schema = "alpha",
-        name = "players",
-        indexes = @Index(name = "nhl_id_index", columnList = "nhlId", unique = true)
+        name = "players"
 )
 public final class Player {
     @Id
-    @lombok.Builder.Default
-    private final UUID id = UUID.randomUUID();
+    private long id;
     private String givenName;
     private String familyName;
-    private long nhlId;
+    private String position;
+    private String birthLocality;
+    private String birthRegion;
+    private String birthCountry;
+    private LocalDate birthDate;
+    private Integer height;
+    private Integer weight;
 }
