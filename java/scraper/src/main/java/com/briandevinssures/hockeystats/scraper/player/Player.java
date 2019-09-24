@@ -4,28 +4,33 @@ import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
-@Builder(builderClassName = "Builder")
+@Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Table(
         schema = "alpha",
-        name = "players"
+        name = "players",
+        indexes = @Index(name = "nhl_id_index", columnList = "nhlId", unique = true)
 )
 public final class Player {
-    @Id
-    private long id;
-    private String givenName;
-    private String familyName;
-    private String position;
-    private String birthLocality;
-    private String birthRegion;
-    private String birthCountry;
-    private LocalDate birthDate;
-    private Integer height;
-    private Integer weight;
+    @Id @Builder.Default
+    String id = UUID.randomUUID().toString();
+
+    long nhlId;
+    String givenName;
+    String familyName;
+    String position;
+    String birthLocality;
+    String birthRegion;
+    String birthCountry;
+    LocalDate birthDate;
+    Integer height;
+    Integer weight;
 }
