@@ -79,22 +79,25 @@ public class ScraperApplication {
     }
 
     @Bean
-    Job catalogNhlGames(Step nhlSeasonsStep, Step playerScraperStep, Step nhlSeasonGamesStep) {
-        return jobs.get("catalog-nhl-games")
+    Job catalogNhlSeasons(Step nhlSeasonsStep) {
+        return jobs.get("catalog-nhl-seasons")
                 .incrementer(new RunIdIncrementer())
                 .start(nhlSeasonsStep)
-                .next(nhlSeasonGamesStep)
-                .next(playerScraperStep)
+                .build();
+    }
+
+    @Bean
+    Job catalogNhlGames(Step nhlSeasonGamesStep) {
+        return jobs.get("catalog-nhl-games")
+                .start(nhlSeasonGamesStep)
                 .build();
     }
 
     @Bean
     Step nhlSeasonsStep(CatalogSeasonsStep catalogSeasonsStep) {
         return steps.get("catalog-nhl-seasons")
-                .<Seasons, List<NhlSeason>>chunk(1)
-                .reader(catalogSeasonsStep)
-                .processor(catalogSeasonsStep)
-                .writer(catalogSeasonsStep)
+                .tasklet(catalogSeasonsStep)
+                .allowStartIfComplete(true)
                 .build();
     }
 
