@@ -1,16 +1,16 @@
-import { Component } from 'react';
-import './App.css';
+import { Component } from 'react'
+import './App.css'
 
 export default class App extends Component {
   state = {
     name: 'web'
   };
 
-  render() {
+  render () {
     return (
-      <div className="App">
+      <div className='App'>
         <h1>Welcome to {this.state.name}</h1>
       </div>
-    );
+    )
   }
 }
