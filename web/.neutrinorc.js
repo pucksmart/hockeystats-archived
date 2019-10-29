@@ -9,6 +9,10 @@ module.exports = {
         }
       }
     ],
-    '@neutrinojs/jest'
+    '@neutrinojs/jest',
+    (neutrino) => neutrino.config
+      .entry('vendor')
+      .add('react')
+      .add('react-dom')
   ]
-};
+}
