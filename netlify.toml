@@ -2,7 +2,7 @@
   base = "web/"
   publish = "web/build/"
   command = "npm run build"
-  ignore = "git diff --quiet HEAD^ HEAD sub_dir/"
+  ignore = "git diff --quiet HEAD^ HEAD web/"
 
 [[redirects]]
   from = "/*"
