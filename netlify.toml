@@ -1,0 +1,10 @@
+[build]
+  base = "web/"
+  publish = "web/build/"
+  command = "npm run build"
+  ignore = "git diff --quiet HEAD^ HEAD sub_dir/"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
