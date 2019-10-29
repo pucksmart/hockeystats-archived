@@ -4,22 +4,25 @@ import com.briandevinssures.hockeystats.scraper.nhl_api.stats.NhlStatsApi;
 import com.briandevinssures.hockeystats.scraper.nhl_api.stats.Schedule;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.*;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import retrofit2.Response;
 
-import java.text.Normalizer;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 @Slf4j
-public class CatalogSeasonGamesStep implements ItemStream, ItemReader<Schedule>, ItemProcessor<Schedule, List<NhlGameSummary>>, ItemWriter<List<NhlGameSummary>> {
+public class CatalogSeasonGamesStep extends AbstractStep implements ItemStream, ItemReader<Schedule>, ItemProcessor<Schedule, List<NhlGameSummary>>, ItemWriter<List<NhlGameSummary>> {
     private static final RateLimiter RATE_LIMITER = RateLimiter.create(1.5);
     private static final String STARTING_DATE_CONTEXT_KEY = CatalogSeasonGamesStep.class.getName() + "/startingDate";
 
@@ -28,11 +31,13 @@ public class CatalogSeasonGamesStep implements ItemStream, ItemReader<Schedule>,
 
     private LocalDate startingDate;
 
-    CatalogSeasonGamesStep(NhlStatsApi nhlStatsApi, NhlSeasonRepository nhlSeasonRepository, NhlGameSummaryRepository nhlGameSummaryRepository) {
+    CatalogSeasonGamesStep(JobRepository jobRepository, NhlStatsApi nhlStatsApi, NhlSeasonRepository nhlSeasonRepository, NhlGameSummaryRepository nhlGameSummaryRepository) {
+        super("catalog-season-games");
+        setJobRepository(jobRepository);
         this.nhlStatsApi = nhlStatsApi;
         this.nhlGameSummaryRepository = nhlGameSummaryRepository;
         this.startingDate = nhlSeasonRepository.findAll(PageRequest.of(0, 1, new Sort(Sort.Direction.ASC, "seasonId"))).get().findFirst().get()
-                .getRegularSeasonStartDate().withDayOfMonth(1);
+                .getRegularSeasonStartDate().minusMonths(1);
     }
 
     @Override
@@ -94,5 +99,17 @@ public class CatalogSeasonGamesStep implements ItemStream, ItemReader<Schedule>,
     @Override
     public void write(List<? extends List<NhlGameSummary>> items) throws Exception {
         items.forEach(nhlGameSummaryRepository::saveAll);
+    }
+
+    @Override
+    protected void doExecute(StepExecution stepExecution) throws Exception {
+        update(stepExecution.getExecutionContext());
+
+        Schedule current = null;
+        while ((current = read()) != null) {
+            List<NhlGameSummary> games = process(current);
+            write(Collections.singletonList(games));
+            update(stepExecution.getExecutionContext());
+        }
     }
 }

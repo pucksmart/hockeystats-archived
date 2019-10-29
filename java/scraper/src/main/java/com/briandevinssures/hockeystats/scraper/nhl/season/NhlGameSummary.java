@@ -1,10 +1,11 @@
 package com.briandevinssures.hockeystats.scraper.nhl.season;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.Instant;
 
 @Data
@@ -13,6 +14,7 @@ import java.time.Instant;
         schema = "alpha",
         name = "nhl_game_summaries"
 )
+@EntityListeners(AuditingEntityListener.class)
 public class NhlGameSummary {
     @Id
     long gameId;
@@ -27,4 +29,12 @@ public class NhlGameSummary {
     int awayScore;
     long homeTeamId;
     int homeScore;
+
+    @Column(name = "created_date", nullable = false, updatable = false)
+    @CreatedDate
+    private Instant createdDate;
+
+    @Column(name = "modified_date")
+    @LastModifiedDate
+    private Instant modifiedDate;
 }
