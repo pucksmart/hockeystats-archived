@@ -12,11 +12,19 @@ module.exports = {
         ]
       }
     }],
+    // ['@neutrinojs/copy', {
+    //   patterns: [{from: "static", to: "."}]
+    // }],
+    (neutrino) => neutrino.config.plugin('copy').tap(args => [[{from: "static", to: "."}]].concat(args.slice(1))),
     '@neutrinojs/jest',
     (neutrino) => neutrino.config
       .entry('vendor')
       .add('react')
-      .add('react-dom'),
+      .add('react-dom')
+      .add('react-router-dom')
+      .add('grommet')
+      .add('grommet-icons')
+      .add('styled-components'),
     (neutrino) => neutrino.config.output.publicPath('/')
   ]
 }
