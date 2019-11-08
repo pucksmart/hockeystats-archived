@@ -18,6 +18,8 @@ public class PlayerWriter implements ItemWriter<List<Player>> {
 
     @Override
     public void write(List<? extends List<Player>> list) throws Exception {
-        list.forEach(playerRepository::saveAll);
+        if (!list.isEmpty()) {
+            list.forEach(playerRepository::saveAll);
+        }
     }
 }

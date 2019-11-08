@@ -36,7 +36,7 @@ public class CatalogSeasonGamesStep extends AbstractStep implements ItemStream, 
         setJobRepository(jobRepository);
         this.nhlStatsApi = nhlStatsApi;
         this.nhlGameSummaryRepository = nhlGameSummaryRepository;
-        this.startingDate = nhlSeasonRepository.findAll(PageRequest.of(0, 1, new Sort(Sort.Direction.ASC, "seasonId"))).get().findFirst().get()
+        this.startingDate = nhlSeasonRepository.findAll(PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "seasonId"))).get().findFirst().get()
                 .getRegularSeasonStartDate().minusMonths(1);
     }
 

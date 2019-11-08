@@ -11,7 +11,7 @@ import java.time.Instant;
 @Data
 @Entity
 @Table(
-        schema = "alpha",
+        schema = "public",
         name = "nhl_game_summaries"
 )
 @EntityListeners(AuditingEntityListener.class)

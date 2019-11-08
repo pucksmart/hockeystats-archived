@@ -22,6 +22,9 @@ public class PlayerSuggestionsProcessor implements ItemProcessor<PlayerSuggestio
 
     @Override
     public List<Player> process(PlayerSuggestions playerSuggestions) throws Exception {
+        if (playerSuggestions.getSuggestions().isEmpty()) {
+            return null;
+        }
         return playerSuggestions.getSuggestions().stream().map(ps -> {
             Optional<Player> existing = playerRepository.findByNhlId(ps.getId());
 

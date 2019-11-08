@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(
-        schema = "alpha",
+        schema = "public",
         name = "nhl_seasons"
 )
 @EntityListeners(AuditingEntityListener.class)

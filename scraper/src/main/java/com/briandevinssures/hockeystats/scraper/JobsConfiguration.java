@@ -1,12 +1,18 @@
 package com.briandevinssures.hockeystats.scraper;
 
 import com.briandevinssures.hockeystats.scraper.batch.JobParametersIncrementers;
+import com.briandevinssures.hockeystats.scraper.nhl.player.PlayerSuggestionsProcessor;
+import com.briandevinssures.hockeystats.scraper.nhl.player.PlayerSuggestionsReader;
+import com.briandevinssures.hockeystats.scraper.nhl.player.PlayerWriter;
 import com.briandevinssures.hockeystats.scraper.nhl.season.CatalogSeasonGamesStep;
 import com.briandevinssures.hockeystats.scraper.nhl.season.CatalogSeasonsStep;
 import com.briandevinssures.hockeystats.scraper.nhl.season.NhlGameSummary;
 import com.briandevinssures.hockeystats.scraper.nhl_api.stats.NhlStatsApi;
 import com.briandevinssures.hockeystats.scraper.nhl_api.stats.Schedule;
 import com.briandevinssures.hockeystats.scraper.nhl_api.suggest.NhlSuggestApi;
+import com.briandevinssures.hockeystats.scraper.nhl_api.suggest.PlayerSuggestion;
+import com.briandevinssures.hockeystats.scraper.nhl_api.suggest.PlayerSuggestions;
+import com.briandevinssures.hockeystats.scraper.player.Player;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobInterruptedException;
@@ -17,6 +23,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.batch.BasicBatchConfigurer;
 import org.springframework.boot.autoconfigure.batch.BatchProperties;
@@ -79,18 +86,31 @@ public class JobsConfiguration extends BasicBatchConfigurer {
                 .build();
     }
 
-//    @Bean
-//    Job seasonGames(CatalogSeasonGamesStep catalogSeasonGamesStep) {
-//        return jobs.get("catalog-nhl-games")
-//                .start(catalogSeasonGamesStep)
-//                .build();
-//    }
+    @Bean
+    Job catalogNhlPlayers(Step catalogPlayersStep) {
+        return jobs.get("catalog-nhl-players")
+                .incrementer(JobParametersIncrementers.CURRENT_DAY)
+                .start(catalogPlayersStep)
+                .build();
+    }
 
     @Bean
     Step nhlSeasonsStep(CatalogSeasonsStep catalogSeasonsStep) {
         return steps.get("catalog-nhl-seasons")
                 .tasklet(catalogSeasonsStep)
                 .allowStartIfComplete(true)
+                .build();
+    }
+
+    @Bean
+    Step catalogPlayersStep(PlayerSuggestionsReader reader, PlayerSuggestionsProcessor processor, PlayerWriter writer) {
+        return steps.get("catalog-nhl-players")
+                .allowStartIfComplete(true)
+                .startLimit(10)
+                .<PlayerSuggestions, List<Player>>chunk(1)
+                .reader(reader)
+                .processor(processor)
+                .writer(writer)
                 .build();
     }
 }

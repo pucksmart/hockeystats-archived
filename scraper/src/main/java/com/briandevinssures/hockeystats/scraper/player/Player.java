@@ -1,11 +1,20 @@
 package com.briandevinssures.hockeystats.scraper.player;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,13 +25,14 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Table(
-        schema = "alpha",
+        schema = "public",
         name = "players",
         indexes = @Index(name = "nhl_id_index", columnList = "nhlId", unique = true)
 )
 @EntityListeners(AuditingEntityListener.class)
 public final class Player {
-    @Id @Builder.Default
+    @Id
+    @Builder.Default
     String id = UUID.randomUUID().toString();
 
     long nhlId;
