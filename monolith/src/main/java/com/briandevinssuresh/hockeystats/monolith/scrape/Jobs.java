@@ -61,7 +61,7 @@ class Jobs {
         return null;
     }
 
-    @Scheduled(fixedRate = 60 * 60 * 1000)
+    @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 10000)
     void playerScrapeJob() throws InterruptedException {
         char[] query = new char[]{'a', 'a', 'a'};
 
@@ -99,11 +99,11 @@ class Jobs {
                     query[0]++;
                 }
             }
-            Thread.sleep(5);
+            Thread.sleep(1000);
         }
     }
 
-//    @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
+    @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
     void seasonInfoScrapeJob() {
         seasonRepository.saveAll(
                 statsApi.listSeasons()
