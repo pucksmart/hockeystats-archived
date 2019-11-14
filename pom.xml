@@ -10,7 +10,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.briandevinssuresh.hockeystats</groupId>
+    <groupId>hockeystats</groupId>
     <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>hockeystats parent</name>

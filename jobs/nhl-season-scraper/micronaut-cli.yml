@@ -1,0 +1,5 @@
+profile: cli
+defaultPackage: nhl.season.scraper
+---
+testFramework: junit
+sourceLanguage: java
