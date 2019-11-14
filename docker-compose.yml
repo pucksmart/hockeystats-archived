@@ -1,17 +1,17 @@
 version: '3'
 services:
-#  postgres:
-#    image: "debezium/postgres:11"
-#    restart: always
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - "./data:/var/lib/postgresql/data"
-#    environment:
-#      POSTGRES_DB: hockeystats
-#      POSTGRES_USER: hockeystats
-#      POSTGRES_PASSWORD: hockeystats
-#      PGDATA: /var/lib/postgresql/data
+  #  postgres:
+  #    image: "debezium/postgres:11"
+  #    restart: always
+  #    ports:
+  #      - "5432:5432"
+  #    volumes:
+  #      - "./data:/var/lib/postgresql/data"
+  #    environment:
+  #      POSTGRES_DB: hockeystats
+  #      POSTGRES_USER: hockeystats
+  #      POSTGRES_PASSWORD: hockeystats
+  #      PGDATA: /var/lib/postgresql/data
   mongodb:
     image: "mongo:4.2"
     hostname: mongodb

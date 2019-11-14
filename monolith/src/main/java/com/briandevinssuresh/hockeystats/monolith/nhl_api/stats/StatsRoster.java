@@ -1,10 +1,9 @@
 package com.briandevinssuresh.hockeystats.monolith.nhl_api.stats;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class StatsRoster {
-    List<RosterPlayer> roster;
+  List<RosterPlayer> roster;
 }

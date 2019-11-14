@@ -17,30 +17,29 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 @EnableScheduling
 public class MonolithApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MonolithApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(MonolithApplication.class, args);
+  }
 
-    @Bean
-    StatsApi nhlStatsApi(ObjectMapper objectMapper) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://statsapi.web.nhl.com")
-                .addCallAdapterFactory(ReactorCallAdapterFactory.create())
-                .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-                .build();
+  @Bean
+  StatsApi nhlStatsApi(ObjectMapper objectMapper) {
+    Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl("https://statsapi.web.nhl.com")
+        .addCallAdapterFactory(ReactorCallAdapterFactory.create())
+        .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+        .build();
 
-        return retrofit.create(StatsApi.class);
-    }
+    return retrofit.create(StatsApi.class);
+  }
 
-    @Bean
-    SuggestApi nhlSuggestApi(ObjectMapper objectMapper) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://suggest.svc.nhl.com")
-                .addCallAdapterFactory(ReactorCallAdapterFactory.create())
-                .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-                .build();
+  @Bean
+  SuggestApi nhlSuggestApi(ObjectMapper objectMapper) {
+    Retrofit retrofit = new Retrofit.Builder()
+        .baseUrl("https://suggest.svc.nhl.com")
+        .addCallAdapterFactory(ReactorCallAdapterFactory.create())
+        .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+        .build();
 
-        return retrofit.create(SuggestApi.class);
-    }
-
+    return retrofit.create(SuggestApi.class);
+  }
 }
