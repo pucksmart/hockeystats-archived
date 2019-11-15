@@ -170,11 +170,6 @@
             </compilerArgs>
             <annotationProcessorPaths>
               <path>
-                <groupId>io.micronaut.configuration</groupId>
-                <artifactId>micronaut-picocli</artifactId>
-                <version>1.2.1</version>
-              </path>
-              <path>
                 <groupId>io.micronaut</groupId>
                 <artifactId>micronaut-inject-java</artifactId>
                 <version>1.2.6</version>
@@ -188,6 +183,11 @@
                 <groupId>io.micronaut</groupId>
                 <artifactId>micronaut-graal</artifactId>
                 <version>1.2.6</version>
+              </path>
+              <path>
+                <groupId>io.micronaut.configuration</groupId>
+                <artifactId>micronaut-picocli</artifactId>
+                <version>1.2.1</version>
               </path>
             </annotationProcessorPaths>
           </configuration>
@@ -203,11 +203,6 @@
                 </compilerArgs>
                 <annotationProcessorPaths>
                   <path>
-                    <groupId>io.micronaut.configuration</groupId>
-                    <artifactId>micronaut-picocli</artifactId>
-                    <version>1.2.1</version>
-                  </path>
-                  <path>
                     <groupId>io.micronaut</groupId>
                     <artifactId>micronaut-inject-java</artifactId>
                     <version>1.2.6</version>
@@ -221,6 +216,11 @@
                     <groupId>io.micronaut</groupId>
                     <artifactId>micronaut-graal</artifactId>
                     <version>1.2.6</version>
+                  </path>
+                  <path>
+                    <groupId>io.micronaut.configuration</groupId>
+                    <artifactId>micronaut-picocli</artifactId>
+                    <version>1.2.1</version>
                   </path>
                 </annotationProcessorPaths>
               </configuration>
