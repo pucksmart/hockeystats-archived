@@ -1,6 +1,7 @@
 module.exports = {
   use: [
-    '@neutrinojs/standardjs',
+    '@neutrinojs/copy',
+    '@neutrinojs/jest',
     ['@neutrinojs/react', {
       html: {
         title: 'web',
@@ -12,11 +13,8 @@ module.exports = {
         ]
       }
     }],
-    // ['@neutrinojs/copy', {
-    //   patterns: [{from: "static", to: "."}]
-    // }],
+    '@neutrinojs/standardjs',
     (neutrino) => neutrino.config.plugin('copy').tap(args => [[{from: "static", to: "."}]].concat(args.slice(1))),
-    '@neutrinojs/jest',
     (neutrino) => neutrino.config
       .entry('vendor')
       .add('react')
