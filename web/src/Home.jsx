@@ -17,19 +17,19 @@ const theme = {
 
 const AppBar = (props) => (
   <Box
-    tag={'header'}
-    direction={'row'}
-    align={'center'}
-    justify={'between'}
-    background={'brand'}
+    tag='header'
+    direction='row'
+    align='center'
+    justify='between'
+    background='brand'
     pad={{ left: 'medium', right: 'small', vertical: 'small' }}
-    elevation={'medium'}
+    elevation='medium'
     style={{ zIndex: '-1' }}
     {...props}
   />
 )
 
-export default withAuth(class Home extends Component {
+class Home extends Component {
   constructor (props) {
     super(props)
     this.state = { authenticated: null }
@@ -50,12 +50,12 @@ export default withAuth(class Home extends Component {
     this.checkAuthentication()
   }
 
-  async login () {
+  async handleLogin () {
     // Redirect to '/' after login
     this.props.auth.login('/')
   }
 
-  async logout () {
+  async handleLogout () {
     // Redirect to '/' after logout
     this.props.auth.logout('/')
   }
@@ -63,8 +63,8 @@ export default withAuth(class Home extends Component {
   render () {
     if (this.state.authenticated === null) return null
     const button = this.state.authenticated
-      ? <Button onClick={this.logout}>Logout</Button>
-      : <Button onClick={this.login}>Login</Button>
+      ? <Button onClick={this.handleLogout}>Logout</Button>
+      : <Button onClick={this.handleLogin}>Login</Button>
 
     return (
       <Grommet theme={theme}>
@@ -80,4 +80,10 @@ export default withAuth(class Home extends Component {
       </Grommet>
     )
   }
-})
+}
+
+Home.propTypes = {
+  auth: React.PropTypes.object
+}
+
+export default withAuth(Home)

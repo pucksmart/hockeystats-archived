@@ -1,28 +1,20 @@
+const copy = require('@neutrinojs/copy');
+const jest = require('@neutrinojs/jest');
+const react = require('@neutrinojs/react');
+const standardjs = require('@neutrinojs/standardjs');
+
 module.exports = {
   use: [
-    '@neutrinojs/copy',
-    '@neutrinojs/jest',
-    ['@neutrinojs/react', {
+    standardjs(),
+    copy(),
+    jest(),
+    react({
       html: {
         title: 'web',
-        links: [
-          {
-            href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500',
-            rel: 'stylesheet'
-          }
-        ]
+        template: require.resolve('./src/page-template.ejs')
       }
-    }],
-    '@neutrinojs/standardjs',
+    }),
     (neutrino) => neutrino.config.plugin('copy').tap(args => [[{from: "static", to: "."}]].concat(args.slice(1))),
-    (neutrino) => neutrino.config
-      .entry('vendor')
-      .add('react')
-      .add('react-dom')
-      .add('react-router-dom')
-      .add('grommet')
-      .add('grommet-icons')
-      .add('styled-components'),
     (neutrino) => neutrino.config.output.publicPath('/')
   ]
 }
