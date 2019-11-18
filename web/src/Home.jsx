@@ -4,9 +4,19 @@ import { withAuth } from '@okta/okta-react'
 import { Box, Button, Grommet, Heading } from 'grommet'
 
 const theme = {
+  rounding: 4,
+  spacing: 16,
   global: {
     colors: {
-      brand: '#228BE6'
+      brand: '#26c281',
+      'accent-1': '#34aadc',
+      'accent-2': '#ffcc00',
+      'accent-3': '#ff2d55',
+      'accent-4': '#007aff',
+      'neutral-1': '#57889c',
+      'neutral-2': '#d1b993',
+      'neutral-3': '#1a2732',
+      'neutral-4': '#688a7e'
     },
     font: {
       family: 'Roboto',
