@@ -92,7 +92,6 @@
               <excludes></excludes>
             </database>
             <generate>
-              <daos>true</daos>
               <fluentSetters>true</fluentSetters>
               <javaTimeTypes>true</javaTimeTypes>
             </generate>

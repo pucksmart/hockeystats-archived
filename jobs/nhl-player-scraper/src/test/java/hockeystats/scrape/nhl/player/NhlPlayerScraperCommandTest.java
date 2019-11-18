@@ -1,4 +1,4 @@
-package nhl.player.scraper;
+package hockeystats.scrape.nhl.player;
 
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
@@ -17,11 +17,6 @@ public class NhlPlayerScraperCommandTest {
     System.setOut(new PrintStream(baos));
 
     try (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
-      String[] args = new String[] {"-v"};
-      PicocliRunner.run(NhlPlayerScraperCommand.class, ctx, args);
-
-      // nhl-player-scraper
-      assertTrue(baos.toString().contains("Hi!"));
     }
   }
 }

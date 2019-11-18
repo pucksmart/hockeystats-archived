@@ -1,50 +1,33 @@
-package nhl.player.scraper;
+package hockeystats.scrape.nhl.player;
 
 import hockeystats.db.Tables;
-import hockeystats.db.tables.daos.PlayersDao;
-import hockeystats.db.tables.pojos.Players;
 import hockeystats.db.tables.records.PlayersRecord;
-import io.micronaut.configuration.picocli.PicocliRunner;
-import java.sql.Date;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
-import org.jooq.Condition;
+import javax.inject.Singleton;
 import org.jooq.DSLContext;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import reactor.core.publisher.Mono;
+import org.jooq.impl.UpdatableRecordImpl;
 
-@Command(name = "nhl-player-scraper", description = "...",
-    mixinStandardHelpOptions = true)
-public class NhlPlayerScraperCommand implements Runnable {
-
-  public static void main(String[] args) throws Exception {
-    PicocliRunner.run(NhlPlayerScraperCommand.class, args);
-  }
-
+@Singleton
+public class Job implements Runnable {
   private static final Pattern HEIGHT_PATTERN = Pattern.compile("(\\d)' (\\d{1,2})\"");
 
-  @Option(names = {"-v", "--verbose"}, description = "...")
-  boolean verbose;
+  @Inject
+  public SuggestApi suggestApi;
 
   @Inject
-  SuggestApi suggestApi;
+  public DSLContext dslContext;
 
-  @Inject
-  DSLContext dslContext;
-
-  @Inject
-  PlayersDao playersDao;
-
-  public void run() {
+  @Override public void run() {
     char[] query = new char[] {'a', 'a', 'a'};
 
     while (true) {
       suggestApi.suggestPlayers(new String(query))
           .flatMapIterable(SuggestPlayers::getSuggestions)
-          .flatMap(p -> Mono.just(fromSuggestPlayer(p)))
+          .log()
+          .map(this::fromSuggestPlayer)
+          .map(UpdatableRecordImpl::store)
           .subscribe();
 
       if (query[0] == 'z' && query[1] == 'z' && query[2] == 'z') {
@@ -69,11 +52,14 @@ public class NhlPlayerScraperCommand implements Runnable {
   }
 
   private PlayersRecord fromSuggestPlayer(SuggestPlayer suggestPlayer) {
-    Players existing = playersDao.fetchOneById(suggestPlayer.getId());
+    PlayersRecord existing = dslContext
+        .selectFrom(Tables.PLAYERS)
+        .where(Tables.PLAYERS.ID.eq(suggestPlayer.getId()))
+        .fetchOne();
     if (existing == null) {
-      existing = new Players();
+      existing = Tables.PLAYERS.newRecord().setId(suggestPlayer.getId());
     }
-    existing.setGivenName(suggestPlayer.getGivenName())
+    return existing.setGivenName(suggestPlayer.getGivenName())
         .setFamilyName(suggestPlayer.getFamilyName())
         .setNumber(suggestPlayer.getNumber() == null ? null : suggestPlayer.getNumber().shortValue())
         .setPosition(suggestPlayer.getPosition())
@@ -83,8 +69,6 @@ public class NhlPlayerScraperCommand implements Runnable {
         .setBirthCountry(suggestPlayer.getBirthCountry())
         .setHeight(heightToInches(suggestPlayer.getHeight()))
         .setWeight(suggestPlayer.getWeight() == null ? null : suggestPlayer.getWeight().shortValue());
-
-    return dslContext.newRecord(Tables.PLAYERS, existing);
   }
 
   private static Short heightToInches(String height) {

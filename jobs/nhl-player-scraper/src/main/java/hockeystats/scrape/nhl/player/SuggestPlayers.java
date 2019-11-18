@@ -1,4 +1,4 @@
-package nhl.player.scraper;
+package hockeystats.scrape.nhl.player;
 
 import java.time.LocalDate;
 import java.util.List;
