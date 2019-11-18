@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { withAuth } from '@okta/okta-react'
 import { Box, Button, Grommet, Heading } from 'grommet'
 
@@ -35,8 +36,8 @@ class Home extends Component {
     this.state = { authenticated: null }
     this.checkAuthentication = this.checkAuthentication.bind(this)
     this.checkAuthentication()
-    this.login = this.login.bind(this)
-    this.logout = this.logout.bind(this)
+    this.handleLogin = this.handleLogin.bind(this)
+    this.handleLogout = this.handleLogout.bind(this)
   }
 
   async checkAuthentication () {
@@ -62,6 +63,7 @@ class Home extends Component {
 
   render () {
     if (this.state.authenticated === null) return null
+
     const button = this.state.authenticated
       ? <Button onClick={this.handleLogout}>Logout</Button>
       : <Button onClick={this.handleLogin}>Login</Button>
@@ -83,7 +85,7 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  auth: React.PropTypes.object
+  auth: PropTypes.object.isRequired
 }
 
 export default withAuth(Home)
