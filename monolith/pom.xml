@@ -96,6 +96,7 @@
         <artifactId>jib-maven-plugin</artifactId>
         <version>1.8.0</version>
         <configuration>
+          <skip>false</skip>
           <to>
             <image>docker.pkg.github.com/devinsba/hockeystats/monolith</image>
           </to>
