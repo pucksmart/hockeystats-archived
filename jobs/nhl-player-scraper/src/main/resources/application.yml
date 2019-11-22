@@ -1,9 +1,0 @@
-micronaut:
-  application:
-    name: nhl-player-scraper
-
-datasources:
-  default:
-    url: jdbc:postgresql:hockeystats
-    username: hockeystats
-    password: hockeystats

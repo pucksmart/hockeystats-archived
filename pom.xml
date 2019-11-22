@@ -23,9 +23,7 @@
   </properties>
 
   <modules>
-    <module>jobs</module>
     <module>monolith</module>
-    <module>postgres</module>
   </modules>
 
   <dependencyManagement>

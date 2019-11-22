@@ -1,15 +1,12 @@
 version: '3'
 services:
-  postgres:
-    image: "postgres:12"
-    restart: always
+  mongodb:
+    image: "mongo:4.2"
+    hostname: mongodb
     ports:
-      - "5432:5432"
+      - 27017:27017
     volumes:
-      - "./data:/var/lib/postgresql/data"
-      - "./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh"
+      - "./data/mongo:/data/db"
     environment:
-      POSTGRES_DB: hockeystats
-      POSTGRES_USER: hockeystats
-      POSTGRES_PASSWORD: hockeystats
-      PGDATA: /var/lib/postgresql/data
+      MONGO_INITDB_ROOT_USERNAME: hockeystats
+      MONGO_INITDB_ROOT_PASSWORD: hockeystats

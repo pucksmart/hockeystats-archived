@@ -52,13 +52,15 @@ class Jobs {
     return null;
   }
 
-  @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 10000)
+  @Scheduled(fixedRate = 60 * 60 * 1000, initialDelay = 2000)
   void playerScrapeJob() throws InterruptedException {
     char[] query = new char[] {'a', 'a', 'a'};
 
     while (true) {
+      String queryString = new String(query);
+      log.info(queryString);
       playerRepository.saveAll(
-          suggestApi.suggestPlayers(new String(query))
+          suggestApi.suggestPlayers(queryString)
               .flatMapIterable(SuggestPlayers::getSuggestions)
               .flatMap(p -> playerRepository.findByNhlId(p.getId())
                   .defaultIfEmpty(Player.builder().build())
@@ -89,7 +91,7 @@ class Jobs {
           query[0]++;
         }
       }
-      Thread.sleep(1000);
+      Thread.sleep(400);
     }
   }
 
@@ -117,7 +119,7 @@ class Jobs {
     ).subscribe();
   }
 
-  @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000, initialDelay = 5000)
+  @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000, initialDelay = 2000)
   void gameScrapeJob() {
     gameRepository.saveAll(
         seasonRepository.findAll()
@@ -132,7 +134,7 @@ class Jobs {
               return Flux.fromIterable(seasonDays);
             })
             .flatMap(d -> statsApi.getScheduleForDate(d.toString()))
-            .delayElements(Duration.of(1, ChronoUnit.SECONDS))
+            .delayElements(Duration.of(500, ChronoUnit.MILLIS))
             .flatMapIterable(Schedule::getDates)
             .flatMapIterable(ScheduleDate::getGames)
             .flatMap(g -> gameRepository.findById(g.getGamePk())
@@ -141,7 +143,7 @@ class Jobs {
                 .map(ge -> ge.gameId(g.getGamePk())
                     .gameType(GameType.fromLetter(g.getGameType()))
                     .seasonId(g.getSeason())
-                    .gameDate(g.getGameDate())
+                    .startAt(g.getGameDate())
                     .venue(g.getVenue().getName())
                     .gameStatus(GameStatus.fromDescription(g.getStatus().getDetailedState()))
                     .awayTeamId(g.getTeams().getAway().getTeam().getId())

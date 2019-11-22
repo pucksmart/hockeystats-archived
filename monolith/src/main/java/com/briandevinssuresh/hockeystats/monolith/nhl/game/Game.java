@@ -24,7 +24,7 @@ public class Game {
 
   GameType gameType;
   String seasonId;
-  Instant gameDate;
+  Instant startAt;
   String venue;
   GameStatus gameStatus;
 
