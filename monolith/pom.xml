@@ -99,6 +99,10 @@
           <skip>false</skip>
           <to>
             <image>docker.pkg.github.com/devinsba/hockeystats/monolith</image>
+            <auth>
+              <username>${env.GITHUB_ACTOR}</username>
+              <password>${env.GITHUB_TOKEN}</password>
+            </auth>
           </to>
           <container>
             <environment>
