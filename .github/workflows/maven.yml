@@ -18,3 +18,5 @@ jobs:
         run: mvn -B verify --file pom.xml
       - name: Push Docker Image(s)
         run: mvn -B jib:build --file pom.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
