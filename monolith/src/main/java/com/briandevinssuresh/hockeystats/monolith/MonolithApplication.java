@@ -1,9 +1,16 @@
 package com.briandevinssuresh.hockeystats.monolith;
 
+import brave.propagation.B3Propagation;
+import brave.propagation.B3SingleFormat;
+import brave.propagation.ExtraFieldPropagation;
+import brave.propagation.Propagation;
 import com.briandevinssuresh.hockeystats.monolith.nhl_api.stats.StatsApi;
 import com.briandevinssuresh.hockeystats.monolith.nhl_api.suggest.SuggestApi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jakewharton.retrofit2.adapter.reactor.ReactorCallAdapterFactory;
+import java.util.List;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +29,18 @@ public class MonolithApplication {
   }
 
   @Bean
-  StatsApi nhlStatsApi(ObjectMapper objectMapper) {
+  OkHttpClient okHttpClient(List<Interceptor> interceptors) {
+    OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    for (Interceptor interceptor : interceptors) {
+      builder.addInterceptor(interceptor);
+    }
+    return builder.build();
+  }
+
+  @Bean
+  StatsApi nhlStatsApi(OkHttpClient okHttpClient, ObjectMapper objectMapper) {
     Retrofit retrofit = new Retrofit.Builder()
+        .client(okHttpClient)
         .baseUrl("https://statsapi.web.nhl.com")
         .addCallAdapterFactory(ReactorCallAdapterFactory.create())
         .addConverterFactory(JacksonConverterFactory.create(objectMapper))
@@ -33,13 +50,20 @@ public class MonolithApplication {
   }
 
   @Bean
-  SuggestApi nhlSuggestApi(ObjectMapper objectMapper) {
+  SuggestApi nhlSuggestApi(OkHttpClient okHttpClient, ObjectMapper objectMapper) {
     Retrofit retrofit = new Retrofit.Builder()
+        .client(okHttpClient)
         .baseUrl("https://suggest.svc.nhl.com")
         .addCallAdapterFactory(ReactorCallAdapterFactory.create())
         .addConverterFactory(JacksonConverterFactory.create(objectMapper))
         .build();
 
     return retrofit.create(SuggestApi.class);
+  }
+
+  @Bean ExtraFieldPropagation.Factory extraFieldPropagation() {
+    return ExtraFieldPropagation.newFactoryBuilder(B3Propagation.FACTORY)
+        .addRedactedField("retrofit-md5")
+        .build();
   }
 }
