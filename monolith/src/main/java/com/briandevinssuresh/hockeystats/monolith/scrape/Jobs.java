@@ -1,5 +1,7 @@
 package com.briandevinssuresh.hockeystats.monolith.scrape;
 
+import brave.propagation.ExtraFieldPropagation;
+import com.briandevinssuresh.hockeystats.monolith.OkResponseHashInterceptor;
 import com.briandevinssuresh.hockeystats.monolith.nhl.game.Game;
 import com.briandevinssuresh.hockeystats.monolith.nhl.game.GameRepository;
 import com.briandevinssuresh.hockeystats.monolith.nhl.game.GameStatus;
@@ -13,7 +15,6 @@ import com.briandevinssuresh.hockeystats.monolith.nhl_api.stats.ScheduleDate;
 import com.briandevinssuresh.hockeystats.monolith.nhl_api.stats.StatsApi;
 import com.briandevinssuresh.hockeystats.monolith.nhl_api.stats.StatsSeasons;
 import com.briandevinssuresh.hockeystats.monolith.nhl_api.suggest.SuggestApi;
-import com.briandevinssuresh.hockeystats.monolith.nhl_api.suggest.SuggestPlayers;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -38,6 +39,7 @@ class Jobs {
   private final GameRepository gameRepository;
   private final PlayerRepository playerRepository;
   private final SeasonRepository seasonRepository;
+  private final ResourceRepository resourceRepository;
 
   private static Integer heightToInches(String height) {
     if (height == null) {
@@ -61,7 +63,17 @@ class Jobs {
       log.info(queryString);
       playerRepository.saveAll(
           suggestApi.suggestPlayers(queryString)
-              .flatMapIterable(SuggestPlayers::getSuggestions)
+              .flatMapIterable(s -> {
+                if (ExtraFieldPropagation.getAll().size() > 0) {
+                  String url = s.raw().request().url().toString();
+                  String md5 = ExtraFieldPropagation.get("retrofit-md5");
+                  Resource existing = resourceRepository.findById(url).block();
+                  Resource.ResourceBuilder builder = existing != null ? existing.toBuilder() : Resource.builder();
+                  Resource resource = builder.url(url).md5(md5).build();
+                  resourceRepository.save(resource).block();
+                }
+                return s.body().getSuggestions();
+              })
               .flatMap(p -> playerRepository.findByNhlId(p.getId())
                   .defaultIfEmpty(Player.builder().build())
                   .map(Player::toBuilder)
@@ -95,7 +107,7 @@ class Jobs {
     }
   }
 
-  @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
+  //  @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
   void seasonInfoScrapeJob() {
     seasonRepository.saveAll(
         statsApi.listSeasons()
@@ -119,7 +131,7 @@ class Jobs {
     ).subscribe();
   }
 
-  @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000, initialDelay = 2000)
+  //  @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000, initialDelay = 2000)
   void gameScrapeJob() {
     gameRepository.saveAll(
         seasonRepository.findAll()
