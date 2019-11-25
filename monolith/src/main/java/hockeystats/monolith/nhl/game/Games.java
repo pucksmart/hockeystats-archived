@@ -20,7 +20,9 @@ public class Games {
 
   public Mono<Game> save(Game game) {
     WrappedGame wrapped = (WrappedGame) game;
+    log.trace(wrapped.getDelegate().toString());
     if (wrapped.getOriginalDelegateHashCode() != wrapped.getDelegate().hashCode()) {
+      log.info(wrapped.getDelegate().toString());
       try {
         return gameRepository
             .save(wrapped.getDelegate())

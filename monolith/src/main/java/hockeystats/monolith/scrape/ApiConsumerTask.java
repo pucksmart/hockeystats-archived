@@ -1,14 +1,12 @@
 package hockeystats.monolith.scrape;
 
 import hockeystats.monolith.nhl_api.ApiResponse;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import retrofit2.Response;
 
 @RequiredArgsConstructor
-@NoArgsConstructor(force = true)
 abstract class ApiConsumerTask<R extends ApiResponse> {
   final ResourceRepository resourceRepository;
 

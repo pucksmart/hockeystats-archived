@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import reactor.core.scheduler.Schedulers;
 import retrofit2.Response;
 
 @Component
@@ -22,7 +23,7 @@ import retrofit2.Response;
 @AllArgsConstructor
 class Jobs {
   private static final Pattern HEIGHT_PATTERN = Pattern.compile("(\\d)' (\\d{1,2})\"");
-  
+
   private final ScrapePlayersApiConsumerTask scrapePlayersTask;
   private final Players players;
   private final ScrapeSeasonsApiConsumerTask scrapeSeasonsTask;
@@ -43,9 +44,10 @@ class Jobs {
     return null;
   }
 
-  //@Scheduled(fixedRate = 60 * 60 * 1000)
+  @Scheduled(fixedRate = 60 * 60 * 1000)
   void playerScrapeJob() throws InterruptedException {
-    scrapePlayersTask.runWithFilter()
+    scrapePlayersTask.run()
+        //scrapePlayersTask.runWithFilter()
         .map(Response::body)
         .flatMapIterable(SuggestPlayers::getSuggestions)
         .flatMap(p -> players.getForNhlId(p.getId())
@@ -60,12 +62,14 @@ class Jobs {
                 .setHeight(heightToInches(p.getHeight()))
                 .setWeight(p.getWeight())))
         .flatMap(players::save)
+        .subscribeOn(Schedulers.elastic())
         .subscribe();
   }
 
-  //@Scheduled(fixedRate = 24 * 60 * 60 * 1000)
+  @Scheduled(fixedRate = 24 * 60 * 60 * 1000)
   void seasonInfoScrapeJob() {
-    scrapeSeasonsTask.runWithFilter()
+    scrapeSeasonsTask.run()
+        //scrapeSeasonsTask.runWithFilter()
         .map(Response::body)
         .flatMapIterable(StatsSeasons::getSeasons)
         .flatMap(s -> seasons.getById(s.getSeasonId())
@@ -80,12 +84,14 @@ class Jobs {
                 .setDivisionsInUse(s.getDivisionsInUse())
                 .setWildCardInUse(s.getWildCardInUse())))
         .flatMap(seasons::save)
+        .subscribeOn(Schedulers.elastic())
         .subscribe();
   }
 
-  @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000)
+  @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000, initialDelay = 5000)
   void gameScrapeJob() {
-    scrapeDaysGamesTask.runWithFilter()
+    scrapeDaysGamesTask.run()
+        //scrapeDaysGamesTask.runWithFilter()
         .map(Response::body)
         .flatMapIterable(Schedule::getDates)
         .flatMapIterable(ScheduleDate::getGames)
@@ -101,6 +107,7 @@ class Jobs {
                 .setHomeTeamId(g.getTeams().getHome().getTeam().getId())
                 .setHomeScore(g.getTeams().getHome().getScore())))
         .flatMap(games::save)
+        .subscribeOn(Schedulers.elastic())
         .subscribe();
   }
 }

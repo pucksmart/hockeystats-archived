@@ -1,6 +1,9 @@
 package hockeystats.monolith.nhl;
 
+import hockeystats.monolith.nhl.game.Game;
 import hockeystats.monolith.nhl.player.Player;
+import hockeystats.monolith.nhl.season.Season;
+import hockeystats.monolith.scrape.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MongoIndexConfigurer {
+  private static final Class[] DOCUMENT_CLASSES =
+      new Class[] {Game.class, Player.class, Resource.class, Season.class};
   private final MongoTemplate mongoTemplate;
   private final MongoMappingContext mongoMappingContext;
 
@@ -21,7 +26,9 @@ public class MongoIndexConfigurer {
   public void initIndicesAfterStartup() {
     IndexResolver resolver = new MongoPersistentEntityIndexResolver(mongoMappingContext);
 
-    IndexOperations indexOps = mongoTemplate.indexOps(Player.class);
-    resolver.resolveIndexFor(Player.class).forEach(indexOps::ensureIndex);
+    for (Class c : DOCUMENT_CLASSES) {
+      IndexOperations indexOps = mongoTemplate.indexOps(c);
+      resolver.resolveIndexFor(c).forEach(indexOps::ensureIndex);
+    }
   }
 }

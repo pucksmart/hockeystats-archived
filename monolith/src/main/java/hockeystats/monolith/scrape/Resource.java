@@ -2,11 +2,7 @@ package hockeystats.monolith.scrape;
 
 import java.time.Instant;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -17,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @EqualsAndHashCode
 @Document("resources")
-class Resource {
+public class Resource {
   @Id
   private String url;
   private String md5;
