@@ -129,9 +129,10 @@ class Jobs {
           }
           return seasonDays;
         })
+        .map(LocalDate::toString)
         .log(Jobs.class.getName())
-        .delayElements(Duration.of(750, ChronoUnit.MILLIS))
-        .flatMap(d -> statsApi.getScheduleForDate(d.toString()))
+        .flatMap(statsApi::getScheduleForDate)
+        .delayElements(Duration.of(500, ChronoUnit.MILLIS))
         .filterWhen(this::apiResponseUpdated)
         .map(Response::body)
         .flatMapIterable(Schedule::getDates)

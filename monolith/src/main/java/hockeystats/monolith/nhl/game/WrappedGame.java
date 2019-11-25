@@ -17,6 +17,9 @@ class WrappedGame extends Game {
   private final int originalDelegateHashCode;
 
   WrappedGame(Game delegate) {
+    if (delegate instanceof WrappedGame) {
+      throw new IllegalArgumentException("Already wrapped");
+    }
     this.delegate = delegate;
     this.originalDelegateHashCode = delegate.hashCode();
   }

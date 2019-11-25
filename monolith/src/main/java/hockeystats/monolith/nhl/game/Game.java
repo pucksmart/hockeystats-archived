@@ -21,18 +21,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("games")
 public class Game {
   @Id
-  long gameId;
+  private long gameId;
 
-  GameType gameType;
-  String seasonId;
-  Instant startAt;
-  String venue;
-  GameStatus gameStatus;
+  private GameType gameType;
+  private String seasonId;
+  private Instant startAt;
+  private String venue;
+  private GameStatus gameStatus;
 
-  long awayTeamId;
-  int awayScore;
-  long homeTeamId;
-  int homeScore;
+  private long awayTeamId;
+  private int awayScore;
+  private long homeTeamId;
+  private int homeScore;
 
   @Setter(AccessLevel.PACKAGE)
   @Version
