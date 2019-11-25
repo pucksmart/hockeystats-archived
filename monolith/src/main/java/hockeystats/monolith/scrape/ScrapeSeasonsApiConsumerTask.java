@@ -9,7 +9,7 @@ import retrofit2.Response;
 
 @Component
 @RequiredArgsConstructor
-public class ScrapeSeasonsApiConsumerTask implements ApiConsumerTask<StatsSeasons> {
+class ScrapeSeasonsApiConsumerTask extends ApiConsumerTask<StatsSeasons> {
   private final StatsApi statsApi;
 
   @Override public Flux<Response<StatsSeasons>> run() {

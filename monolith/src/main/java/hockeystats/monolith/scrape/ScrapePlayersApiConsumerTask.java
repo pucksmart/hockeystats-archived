@@ -11,7 +11,7 @@ import retrofit2.Response;
 
 @Component
 @RequiredArgsConstructor
-public class ScrapePlayersApiConsumerTask implements ApiConsumerTask<SuggestPlayers> {
+class ScrapePlayersApiConsumerTask extends ApiConsumerTask<SuggestPlayers> {
   private final SuggestApi suggestApi;
 
   @Override public Flux<Response<SuggestPlayers>> run() {

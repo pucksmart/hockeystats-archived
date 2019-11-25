@@ -5,24 +5,16 @@ import hockeystats.monolith.nhl.game.GameType;
 import hockeystats.monolith.nhl.game.Games;
 import hockeystats.monolith.nhl.player.Players;
 import hockeystats.monolith.nhl.season.Seasons;
-import hockeystats.monolith.nhl_api.ApiResponse;
 import hockeystats.monolith.nhl_api.stats.Schedule;
 import hockeystats.monolith.nhl_api.stats.ScheduleDate;
-import hockeystats.monolith.nhl_api.stats.StatsApi;
 import hockeystats.monolith.nhl_api.stats.StatsSeasons;
 import hockeystats.monolith.nhl_api.suggest.SuggestPlayers;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 import retrofit2.Response;
 
 @Component
@@ -30,13 +22,12 @@ import retrofit2.Response;
 @AllArgsConstructor
 class Jobs {
   private static final Pattern HEIGHT_PATTERN = Pattern.compile("(\\d)' (\\d{1,2})\"");
-
-  private final StatsApi statsApi;
-  private final ResourceRepository resourceRepository;
+  
   private final ScrapePlayersApiConsumerTask scrapePlayersTask;
   private final Players players;
   private final ScrapeSeasonsApiConsumerTask scrapeSeasonsTask;
   private final Seasons seasons;
+  private final ScrapeDaysGamesApiConsumerTask scrapeDaysGamesTask;
   private final Games games;
 
   private static Integer heightToInches(String height) {
@@ -52,32 +43,9 @@ class Jobs {
     return null;
   }
 
-  private Mono<Boolean> apiResponseUpdated(Response<? extends ApiResponse> apiResponse) {
-    if (apiResponse == null || apiResponse.body() == null) {
-      return Mono.just(false);
-    }
-    String url = apiResponse.raw().request().url().toString();
-    String hash = apiResponse.body().getHash();
-
-    return resourceRepository.findById(url)
-        .defaultIfEmpty(new Resource())
-        .map(r -> {
-          int existingHashCode = r.hashCode();
-          r.setUrl(url)
-              .setMd5(hash);
-          if (existingHashCode == r.hashCode()) {
-            return false;
-          } else {
-            resourceRepository.save(r).subscribe();
-            return true;
-          }
-        });
-  }
-
   //@Scheduled(fixedRate = 60 * 60 * 1000)
   void playerScrapeJob() throws InterruptedException {
-    scrapePlayersTask.run()
-        .filterWhen(this::apiResponseUpdated)
+    scrapePlayersTask.runWithFilter()
         .map(Response::body)
         .flatMapIterable(SuggestPlayers::getSuggestions)
         .flatMap(p -> players.getForNhlId(p.getId())
@@ -97,8 +65,7 @@ class Jobs {
 
   //@Scheduled(fixedRate = 24 * 60 * 60 * 1000)
   void seasonInfoScrapeJob() {
-    scrapeSeasonsTask.run()
-        .filterWhen(this::apiResponseUpdated)
+    scrapeSeasonsTask.runWithFilter()
         .map(Response::body)
         .flatMapIterable(StatsSeasons::getSeasons)
         .flatMap(s -> seasons.getById(s.getSeasonId())
@@ -118,22 +85,7 @@ class Jobs {
 
   @Scheduled(fixedRate = 7 * 24 * 60 * 60 * 1000)
   void gameScrapeJob() {
-    seasons.getAll()
-        .flatMapIterable(s -> {
-          LocalDate temp = s.getRegularSeasonStartDate();
-          List<LocalDate> seasonDays = new ArrayList<>();
-          seasonDays.add(temp);
-          while (!temp.plusDays(1).isAfter(s.getSeasonEndDate())) {
-            temp = temp.plusDays(1);
-            seasonDays.add(temp);
-          }
-          return seasonDays;
-        })
-        .map(LocalDate::toString)
-        .log(Jobs.class.getName())
-        .flatMap(statsApi::getScheduleForDate)
-        .delayElements(Duration.of(500, ChronoUnit.MILLIS))
-        .filterWhen(this::apiResponseUpdated)
+    scrapeDaysGamesTask.runWithFilter()
         .map(Response::body)
         .flatMapIterable(Schedule::getDates)
         .flatMapIterable(ScheduleDate::getGames)
