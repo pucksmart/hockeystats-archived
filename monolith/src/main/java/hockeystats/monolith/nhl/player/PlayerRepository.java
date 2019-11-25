@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface PlayerRepository extends ReactiveMongoRepository<Player, String> {
+interface PlayerRepository extends ReactiveMongoRepository<Player, String> {
   Mono<Player> findByNhlId(long nhlId);
 }

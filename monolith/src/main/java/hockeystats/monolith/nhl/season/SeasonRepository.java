@@ -4,5 +4,5 @@ import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SeasonRepository extends ReactiveMongoRepository<Season, String> {
+interface SeasonRepository extends ReactiveMongoRepository<Season, String> {
 }

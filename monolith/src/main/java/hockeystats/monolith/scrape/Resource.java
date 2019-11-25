@@ -19,9 +19,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("resources")
 class Resource {
   @Id
-  String url;
-  String md5;
-  String json;
+  private String url;
+  private String md5;
 
   @Setter(AccessLevel.PACKAGE)
   @Version
