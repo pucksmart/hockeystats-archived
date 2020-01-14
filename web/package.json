@@ -23,7 +23,7 @@
     "react-dom": "^16.11.0",
     "react-hot-loader": "^4.12.18",
     "react-router-dom": "^5.1.2",
-    "styled-components": "^4.4.0"
+    "styled-components": "^5.0.0"
   },
   "devDependencies": {
     "@neutrinojs/copy": "^9.0.0-rc.5",
